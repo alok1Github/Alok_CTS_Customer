@@ -4,31 +4,21 @@ using System.Linq;
 using System.Threading.Tasks;
 using Customer.DataAccess;
 using Customer.DataAccess.BusinessObject;
+using Microsoft.Azure.Cosmos;
 
 namespace Customer.DataAccess.Data
 {
     public class Repository : IRepository
     {
-        public async Task<IEnumerable<Customers>> GetAllCustomer()
+        public Task<IEnumerable<Customers>> GetAllCustomer() =>
+            Task.Run(() => CosmoDB.container.GetItemLinqQueryable<Customers>().AsEnumerable());
+
+        public async Task<Customers> CreateCustomer(Customers customer, PartitionKey id)
         {
-            var container = CosmoDB.client.GetContainer("customers", "customers");
-            var sql = "select * from c";
-            var itrator = container.GetItemQueryIterator<Customers>(sql);
-            return await itrator.ReadNextAsync();
+            return await CosmoDB.container.CreateItemAsync(customer, id);
         }
 
-        //private async Task<IEnumerable<Customers>> GetAll()
-        //{
-        //    await new CustomerDataAccess().DataAccessSDK();
 
 
-        //    ////return new List<Customers> {
-
-        //    ////          new Customers { Name = "Test", Type = "Poc" },
-        //    ////          new Customers { Name = "Test2", Type = "Poc2" },
-        //    ////          new Customers { Name = "Test3", Type = "Poc3" }
-        //    ////    };
-
-        //}
     }
 }

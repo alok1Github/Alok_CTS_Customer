@@ -1,4 +1,5 @@
 ﻿using Customer.DataAccess.BusinessObject;
+using Microsoft.Azure.Cosmos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,9 @@ namespace Customer.DataAccess.Data
     {
 
         Task<IEnumerable<Customers>> GetAllCustomer();
+        Task<Customers> CreateCustomer(Customers customer, PartitionKey id);
+
+
         // Task<IEnumerable<TBusinessObject>> GetAll<TBusinessObject, Tmodel>(TBusinessObject document) where TBusinessObject : BusinessObjectBase, new();
         //   void Delete(BusinessObjectBase entity);
 
