@@ -11,7 +11,7 @@ namespace Customer.DataAccess.Data
     {
 
         Task<IEnumerable<Customers>> GetAllCustomer();
-        Task<Customers> CreateCustomer(Customers customer, PartitionKey id);
+        Task<Customers> CreateCustomer(Customers customer);
 
 
         // Task<IEnumerable<TBusinessObject>> GetAll<TBusinessObject, Tmodel>(TBusinessObject document) where TBusinessObject : BusinessObjectBase, new();

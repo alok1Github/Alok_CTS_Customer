@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using Customer.API.Models;
+using Customer.DataAccess.BusinessObject;
 using Customer.DataAccess.Data;
+using Microsoft.Azure.Cosmos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +12,7 @@ namespace Customer.API.Features
 {
     public interface IPostCustomer
     {
-        Task<IEnumerable<CustomerModel>> Handler();
+        Task<CustomerModel> Handler(CustomerModel request);
     }
 
     public class PostCustomer : IPostCustomer
@@ -24,12 +26,18 @@ namespace Customer.API.Features
             this.mapper = mapper;
         }
 
-        public Task<IEnumerable<CustomerModel>> Handler()
+        public Task<CustomerModel> Handler(CustomerModel request)
         {
-            return this.repository.GetAllCustomer()
-                                  .ContinueWith(t =>
-                                   this.mapper.Map<IEnumerable<CustomerModel>>(t.Result),
-                                   TaskContinuationOptions.OnlyOnRanToCompletion);
+            var customer = this.mapper.Map<Customers>(request);
+
+            customer.Id = Guid.NewGuid().ToString();
+
+            return this.repository.CreateCustomer(customer)
+                                   .ContinueWith(t => this.mapper.Map<CustomerModel>(t.Result),
+                                    TaskContinuationOptions.OnlyOnRanToCompletion);
+
+
+
         }
 
 

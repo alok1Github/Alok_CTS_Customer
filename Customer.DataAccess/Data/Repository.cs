@@ -11,11 +11,18 @@ namespace Customer.DataAccess.Data
     public class Repository : IRepository
     {
         public Task<IEnumerable<Customers>> GetAllCustomer() =>
-            Task.Run(() => CosmoDB.container.GetItemLinqQueryable<Customers>().AsEnumerable());
+            Task.Run(() => CosmoDB.Container.GetItemLinqQueryable<Customers>(allowSynchronousQueryExecution: true).AsEnumerable());
 
-        public async Task<Customers> CreateCustomer(Customers customer, PartitionKey id)
+        public async Task<Customers> CreateCustomer(Customers customer)
         {
-            return await CosmoDB.container.CreateItemAsync(customer, id);
+            try
+            {
+                return await CosmoDB.Container.CreateItemAsync(customer, new PartitionKey(customer.CustomerId));
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
 

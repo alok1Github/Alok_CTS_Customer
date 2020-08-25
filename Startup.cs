@@ -23,6 +23,7 @@ namespace Customer.API
         {
             services.AddScoped<IRepository, Repository>();
             services.AddScoped<IGetCustomers, GetCustomers>();
+            services.AddScoped<IPostCustomer, PostCustomer>();
             services.AddAutoMapper(typeof(Startup));
             services.AddControllersWithViews();
         }
