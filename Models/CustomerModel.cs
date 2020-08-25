@@ -10,11 +10,15 @@ namespace Customer.API.Models
 {
     public class CustomerModel
     {
+        public CustomerModel()
+        {
+        }
+
         [JsonProperty(PropertyName = "id")]
         public string Id { get; set; }
 
         [JsonProperty(PropertyName = "customerId")]
-        public string CustomerId { get; set; }
+        public int CustomerId { get; set; }
 
         [JsonProperty(PropertyName = "bankDetails")]
         public BankDetailsModel BankDetails { get; set; }
@@ -25,8 +29,6 @@ namespace Customer.API.Models
         [JsonProperty(PropertyName = "personalDetail")]
         public PersonalDetailsModel PersonalDetail { get; set; }
 
-        public CustomerModel()
-        {
-        }
+
     }
 }

@@ -12,7 +12,7 @@ namespace Customer.DataAccess.BusinessObject
         public string Id { get; set; }
 
         [JsonProperty(PropertyName = "customerId")]
-        public string CustomerId { get; set; }
+        public int CustomerId { get; set; }
         public BankDetails BankDetails { get; set; }
         public Address Address { get; set; }
 

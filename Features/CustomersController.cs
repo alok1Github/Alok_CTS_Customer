@@ -14,12 +14,15 @@ namespace Customer.API.Features
     {
         private readonly IGetCustomers get;
         private readonly IPostCustomer post;
+        private readonly IPutCustomer put;
         private readonly IDeleteCustomer delete;
 
-        public CustomersController(IGetCustomers get, IPostCustomer post, IDeleteCustomer delete)
+        public CustomersController(IGetCustomers get, IPostCustomer post,
+                                    IPutCustomer put, IDeleteCustomer delete)
         {
             this.get = get;
             this.post = post;
+            this.put = put;
             this.delete = delete;
         }
 
@@ -31,7 +34,7 @@ namespace Customer.API.Features
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateCustomer(CustomerModel customer)
+        public async Task<ActionResult<CustomerModel>> CreateCustomer(CustomerModel customer)
         {
             // To do's
             // 1. propery error handling , 2 return right code 3. versioing in API 4. looging 5. geo failure .6 security
@@ -43,10 +46,15 @@ namespace Customer.API.Features
         [HttpDelete("{customerId}")]
         public async Task<IActionResult> DeleteCustomer(int customerId)
         {
-            // To do's
-            // 1. propery error handling , 2 return right code 3. versioing in API 4. looging 5. geo failure .6 security
-            var result = await this.delete.Handler(customerId);
-            return Ok(result);
+            await this.delete.Handler(customerId);
+            return Ok();
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateCustomer(CustomerModel customer)
+        {
+            await this.put.Handler(customer);
+            return Ok();
         }
     }
 }

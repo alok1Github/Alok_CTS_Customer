@@ -27,15 +27,29 @@ namespace Customer.DataAccess.Data
 
         public async Task DeleteCustomer(int customerId)
         {
-
             var customers = CosmoDB.Container.GetItemLinqQueryable<Customers>(allowSynchronousQueryExecution: true)
-                                            .Where(c => c.CustomerId == customerId.ToString())
-                                            .ToList();
+                                             .Where(c => c.CustomerId == customerId)
+                                             .ToList();
 
             foreach (var customer in customers)
             {
-                await CosmoDB.Container.DeleteItemAsync<Customers>(customer.Id, new PartitionKey(customer.CustomerId.ToString()));
+                await CosmoDB.Container.DeleteItemAsync<Customers>(customer.Id, new PartitionKey(customer.CustomerId));
             }
+        }
+
+        public async Task UpdateCustomer(Customers customer)
+        {
+            var customers = CosmoDB.Container.GetItemLinqQueryable<Customers>(allowSynchronousQueryExecution: true)
+                                           .Where(c => c.CustomerId == customer.CustomerId)
+                                           .ToList();
+            foreach (var document in customers)
+            {
+                document.BankDetails = customer.BankDetails;
+                document.Address = customer.Address;
+                document.PersonalDetail = customer.PersonalDetail;
+               await CosmoDB.Container.ReplaceItemAsync<Customers>(document, document.Id, new PartitionKey(document.CustomerId));                  
+            }
+
         }
     }
 }

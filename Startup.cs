@@ -24,7 +24,8 @@ namespace Customer.API
             services.AddScoped<IRepository, Repository>();
             services.AddScoped<IGetCustomers, GetCustomers>();
             services.AddScoped<IPostCustomer, PostCustomer>();
-            services.AddScoped<IDeleteCustomer, DeleteCustomer>();
+            services.AddScoped<IPutCustomer, PutCustomers>();
+            services.AddScoped<IDeleteCustomer, DeleteCustomers>();
             services.AddAutoMapper(typeof(Startup));
             services.AddControllersWithViews();
         }
