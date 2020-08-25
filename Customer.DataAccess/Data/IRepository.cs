@@ -13,6 +13,8 @@ namespace Customer.DataAccess.Data
         Task<IEnumerable<Customers>> GetAllCustomer();
         Task<Customers> CreateCustomer(Customers customer);
 
+        Task DeleteCustomer(int customerId);
+
 
         // Task<IEnumerable<TBusinessObject>> GetAll<TBusinessObject, Tmodel>(TBusinessObject document) where TBusinessObject : BusinessObjectBase, new();
         //   void Delete(BusinessObjectBase entity);

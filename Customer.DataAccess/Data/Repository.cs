@@ -25,7 +25,17 @@ namespace Customer.DataAccess.Data
             }
         }
 
+        public async Task DeleteCustomer(int customerId)
+        {
 
+            var customers = CosmoDB.Container.GetItemLinqQueryable<Customers>(allowSynchronousQueryExecution: true)
+                                            .Where(c => c.CustomerId == customerId.ToString())
+                                            .ToList();
 
+            foreach (var customer in customers)
+            {
+                await CosmoDB.Container.DeleteItemAsync<Customers>(customer.Id, new PartitionKey(customer.CustomerId.ToString()));
+            }
+        }
     }
 }

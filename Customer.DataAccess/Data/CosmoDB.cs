@@ -23,10 +23,7 @@ namespace Customer.DataAccess.Data
         {
             var config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
 
-            var endpoint = config["cosmoEndPoint"];
-            var masterKey = config["cosmoMasterKey"];
-
-            Client = new CosmosClient(endpoint, masterKey);
+            Client = new CosmosClient(config["cosmoEndPoint"], config["cosmoMasterKey"]);
         }
 
         private static async Task<Container> GetOrCreateContainer()
