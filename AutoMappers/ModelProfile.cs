@@ -16,6 +16,7 @@ namespace Customer.API.AutoMappers
             CreateMap<BankDetails, BankDetailsModel>().ReverseMap();
             CreateMap<PersonalDetails, PersonalDetailsModel>().ReverseMap();
             CreateMap<Address, AddressModel>().ReverseMap();
+            CreateMap<Serach, SerachModel>().ReverseMap();
         }
     }
 }

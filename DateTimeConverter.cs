@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -7,16 +8,23 @@ using System.Threading.Tasks;
 
 namespace Customer.API
 {
-    public class DateTimeConverter : JsonConverter<DateTime>
+    public class DateTimeConverter : JsonConverter<DateTimeOffset>
     {
-        public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        private const string TwitterDateFormat = "MM/dd/yyyy";
+
+        public override DateTimeOffset Read(
+            ref Utf8JsonReader reader,
+            Type typeToConvert,
+            JsonSerializerOptions options)
         {
-            return Convert.ToDateTime(reader.GetString().ToLower());
+            return DateTimeOffset.ParseExact(reader.GetString(), TwitterDateFormat, CultureInfo.InvariantCulture);
         }
 
-        public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
-        {
-            throw new NotImplementedException();
-        }
+        public override void Write(
+            Utf8JsonWriter writer,
+            DateTimeOffset value,
+            JsonSerializerOptions options) =>
+            writer.WriteStringValue(value.ToString(TwitterDateFormat, CultureInfo.InvariantCulture));
     }
 }
+

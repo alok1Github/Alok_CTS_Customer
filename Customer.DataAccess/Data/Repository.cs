@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Customer.DataAccess;
 using Customer.DataAccess.BusinessObject;
@@ -10,7 +11,7 @@ namespace Customer.DataAccess.Data
 {
     public class Repository : IRepository
     {
-        public Task<IEnumerable<Customers>> GetAllCustomer() =>
+        public Task<IEnumerable<Customers>> GetAllCustomers() =>
             Task.Run(() => CosmoDB.Container.GetItemLinqQueryable<Customers>(allowSynchronousQueryExecution: true).AsEnumerable());
 
         public async Task<Customers> CreateCustomer(Customers customer)
@@ -47,9 +48,39 @@ namespace Customer.DataAccess.Data
                 document.BankDetails = customer.BankDetails;
                 document.Address = customer.Address;
                 document.PersonalDetail = customer.PersonalDetail;
-               await CosmoDB.Container.ReplaceItemAsync<Customers>(document, document.Id, new PartitionKey(document.CustomerId));                  
+                await CosmoDB.Container.ReplaceItemAsync<Customers>(document, document.Id, new PartitionKey(document.CustomerId));
             }
 
+        }
+
+
+        public async Task<IEnumerable<Customers>> SearchCustomers(Serach serachTerm)
+        {
+            if (serachTerm == null)
+            {
+                return null;
+            }
+            if (serachTerm.DOB != null && string.IsNullOrEmpty(serachTerm.ZipCode))
+            {
+                return await SearchCustomers(c => c.PersonalDetail.DOB == serachTerm.DOB);
+            }
+
+            else if (serachTerm.DOB == null && !string.IsNullOrEmpty(serachTerm.ZipCode))
+            {
+                return await SearchCustomers(c => c.Address.ZipCode == serachTerm.ZipCode);
+            }
+
+            else
+            {
+                return await SearchCustomers(c => c.Address.ZipCode == serachTerm.ZipCode && c.PersonalDetail.DOB == serachTerm.DOB);
+            }
+        }
+
+        private static Task<List<Customers>> SearchCustomers(Expression<Func<Customers, bool>> whereClause)
+        {
+            return Task.Run(() => CosmoDB.Container.GetItemLinqQueryable<Customers>(allowSynchronousQueryExecution: true)
+                                           .Where(whereClause)
+                                           .ToList());
         }
     }
 }

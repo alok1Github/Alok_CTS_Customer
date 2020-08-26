@@ -12,12 +12,12 @@ namespace Customer.API.Features
     [ApiController]
     public class CustomersController : ControllerBase
     {
-        private readonly IGetCustomers get;
+        private readonly IEnumerable<IGetCustomers> get;
         private readonly IPostCustomer post;
         private readonly IPutCustomer put;
         private readonly IDeleteCustomer delete;
 
-        public CustomersController(IGetCustomers get, IPostCustomer post,
+        public CustomersController(IEnumerable<IGetCustomers> get, IPostCustomer post,
                                     IPutCustomer put, IDeleteCustomer delete)
         {
             this.get = get;
@@ -29,7 +29,22 @@ namespace Customer.API.Features
         [HttpGet]
         public async Task<IActionResult> GetCustomers()
         {
-            var result = await this.get.Handler();
+            var result = await this.get.Last().Handler();
+            return Ok(result);
+        }
+
+        [HttpGet("{search}")]
+        public async Task<IActionResult> SearchByDate(DateTime date)
+        {
+
+            var result = await this.get.First().Handler(new SerachModel { DOB = date });
+            return Ok(result);
+        }
+
+        [HttpGet("{searchbyPostCode}/postCode")]
+        public async Task<IActionResult> SearchByPostCode(string code)
+        {
+            var result = await this.get.First().Handler(new SerachModel { ZipCode = code, DOB = null });
             return Ok(result);
         }
 

@@ -22,11 +22,19 @@ namespace Customer.API
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<IRepository, Repository>();
+            services.AddScoped<IGetCustomers, SearchCustomers>();
             services.AddScoped<IGetCustomers, GetCustomers>();
             services.AddScoped<IPostCustomer, PostCustomer>();
             services.AddScoped<IPutCustomer, PutCustomers>();
             services.AddScoped<IDeleteCustomer, DeleteCustomers>();
             services.AddAutoMapper(typeof(Startup));
+            services
+         .AddMvc()
+         .AddJsonOptions(opts =>
+         {
+             opts.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
+
+         });
             services.AddControllersWithViews();
         }
 

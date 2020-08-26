@@ -17,8 +17,6 @@ namespace Customer.DataAccess.BusinessObject
         public Address Address { get; set; }
 
         public PersonalDetails PersonalDetail { get; set; }
-
-        // This is needed for serialization
         public Customers()
         { }
     }

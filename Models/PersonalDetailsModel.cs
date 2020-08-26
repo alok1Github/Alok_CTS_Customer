@@ -8,7 +8,7 @@ namespace Customer.API.Models
         public PersonalDetailsModel() { }
 
         [JsonProperty(PropertyName = "dob")]
-        public string DOB { get; set; }
+        public DateTimeOffset DOB { get; set; }
         [JsonProperty(PropertyName = "phoneNumber")]
         public string PhoneNumber { get; set; }
 
