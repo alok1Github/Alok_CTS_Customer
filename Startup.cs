@@ -6,6 +6,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Customer.API.ExceptionHandlers;
+using Microsoft.AspNetCore.Diagnostics;
+using Newtonsoft.Json;
+using Microsoft.AspNetCore.Http;
+using System;
+using System.Net;
 
 namespace Customer.API
 {
@@ -14,6 +20,7 @@ namespace Customer.API
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
         }
 
         public IConfiguration Configuration { get; }
@@ -27,6 +34,7 @@ namespace Customer.API
             services.AddScoped<IPostCustomer, PostCustomer>();
             services.AddScoped<IPutCustomer, PutCustomers>();
             services.AddScoped<IDeleteCustomer, DeleteCustomers>();
+            services.AddScoped<ValidationHandler>();
             services.AddAutoMapper(typeof(Startup));
             services
          .AddMvc()
@@ -35,6 +43,7 @@ namespace Customer.API
              opts.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
 
          });
+
             services.AddControllersWithViews();
         }
 
@@ -54,7 +63,11 @@ namespace Customer.API
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+
+            app.UseExceptionHandler(a => GobalHandler(a));
+
             app.UseRouting();
+            app.UseDefaultFiles();
 
             app.UseAuthorization();
 
@@ -63,6 +76,17 @@ namespace Customer.API
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Get}/{id?}");
+            });
+        }
+
+        private static void GobalHandler(IApplicationBuilder app)
+        {
+            app.Run(async context =>
+            {
+                var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+                context.Response.ContentType = "application/json";
+                var result = JsonConvert.SerializeObject(ExceptionResponseBuilder.createRespone(exceptionHandlerPathFeature.Error, context));
+                await context.Response.WriteAsync(result);
             });
         }
     }

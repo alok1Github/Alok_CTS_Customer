@@ -36,10 +36,6 @@ namespace Customer.API.Features
                                    .ContinueWith(t => this.mapper.Map<CustomerModel>(t.Result),
                                     TaskContinuationOptions.OnlyOnRanToCompletion);
 
-
-
         }
-
-
     }
 }

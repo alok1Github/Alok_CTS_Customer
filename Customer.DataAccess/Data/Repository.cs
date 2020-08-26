@@ -14,17 +14,9 @@ namespace Customer.DataAccess.Data
         public Task<IEnumerable<Customers>> GetAllCustomers() =>
             Task.Run(() => CosmoDB.Container.GetItemLinqQueryable<Customers>(allowSynchronousQueryExecution: true).AsEnumerable());
 
-        public async Task<Customers> CreateCustomer(Customers customer)
-        {
-            try
-            {
-                return await CosmoDB.Container.CreateItemAsync(customer, new PartitionKey(customer.CustomerId));
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
+        public async Task<Customers> CreateCustomer(Customers customer) =>
+             await CosmoDB.Container.CreateItemAsync(customer, new PartitionKey(customer.CustomerId));
+
 
         public async Task DeleteCustomer(int customerId)
         {
@@ -52,7 +44,6 @@ namespace Customer.DataAccess.Data
             }
 
         }
-
 
         public async Task<IEnumerable<Customers>> SearchCustomers(Serach serachTerm)
         {

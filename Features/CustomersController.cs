@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Customer.API.ExceptionHandlers;
 using Customer.API.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,7 @@ namespace Customer.API.Features
 {
     [Route("api/[controller]")]
     [ApiController]
+    [ServiceFilter(typeof(ValidationHandler))]
     public class CustomersController : ControllerBase
     {
         private readonly IEnumerable<IGetCustomers> get;
@@ -26,6 +28,10 @@ namespace Customer.API.Features
             this.delete = delete;
         }
 
+        /// <summary>
+        ///   GetCustomers All customers 
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> GetCustomers()
         {
@@ -33,38 +39,64 @@ namespace Customer.API.Features
             return Ok(result);
         }
 
+        /// <summary>
+        ///Search customer by date of birth 
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
         [HttpGet("{search}")]
         public async Task<IActionResult> SearchByDate(DateTime date)
         {
-
             var result = await this.get.First().Handler(new SerachModel { DOB = date });
-            return Ok(result);
+
+            return !result.Any() ? NotFound(Constant.SerachNotFound) : (IActionResult)Ok(result);
         }
 
-        [HttpGet("{searchbyPostCode}/postCode")]
-        public async Task<IActionResult> SearchByPostCode(string code)
+        /// <summary>
+        /// Search customer by Postcode
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>  
+        [HttpGet("{search}/postCode")]
+        public async Task<IActionResult> SearchByPostCode(int code)
         {
-            var result = await this.get.First().Handler(new SerachModel { ZipCode = code, DOB = null });
-            return Ok(result);
+            var result = await this.get.First().Handler(new SerachModel { ZipCode = code.ToString(), DOB = null });
+
+            return !result.Any() ? NotFound(Constant.SerachNotFound) : (IActionResult)Ok(result);
         }
 
+        /// <summary>
+        ///  Create new Customer
+        /// </summary>
+        /// <param name="customer"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<ActionResult<CustomerModel>> CreateCustomer(CustomerModel customer)
         {
-            // To do's
-            // 1. propery error handling , 2 return right code 3. versioing in API 4. looging 5. geo failure .6 security
             var result = await this.post.Handler(customer);
             return Ok(result);
         }
 
-
+        /// <summary>
+        ///  Delete a Customer based on customerId
+        /// </summary>
+        /// <param name="customerId"></param>
+        /// <returns></returns>
         [HttpDelete("{customerId}")]
         public async Task<IActionResult> DeleteCustomer(int customerId)
         {
+            if (customerId <= 0) BadRequest(Constant.BadId);
+
             await this.delete.Handler(customerId);
+
             return Ok();
         }
 
+        /// <summary>
+        ///  Update Customers
+        /// </summary>
+        /// <param name="customer"></param>
+        /// <returns></returns>
         [HttpPut]
         public async Task<IActionResult> UpdateCustomer(CustomerModel customer)
         {
