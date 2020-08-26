@@ -18,7 +18,6 @@ namespace Customer.API.Features
             this.repository = repository;
             this.mapper = mapper;
         }
-
         public Task<IEnumerable<CustomerModel>> Handler(SerachModel searchRequest = null)
         {
             return this.repository.GetAllCustomers()

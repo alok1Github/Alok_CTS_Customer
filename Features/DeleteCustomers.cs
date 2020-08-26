@@ -18,12 +18,7 @@ namespace Customer.API.Features
     public class DeleteCustomers : IDeleteCustomer
     {
         private readonly IRepository repository;
-
         public DeleteCustomers(IRepository repository) => this.repository = repository;
-
-        public Task Handler(int customerId)
-        {
-            return this.repository.DeleteCustomer(customerId);
-        }
+        public Task Handler(int customerId) => this.repository.DeleteCustomer(customerId);
     }
 }

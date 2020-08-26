@@ -35,6 +35,7 @@ namespace Customer.DataAccess.Data
             var customers = CosmoDB.Container.GetItemLinqQueryable<Customers>(allowSynchronousQueryExecution: true)
                                            .Where(c => c.CustomerId == customer.CustomerId)
                                            .ToList();
+
             foreach (var document in customers)
             {
                 document.BankDetails = customer.BankDetails;

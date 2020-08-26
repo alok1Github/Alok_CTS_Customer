@@ -12,6 +12,8 @@ namespace Customer.API.Features
     [Route("api/[controller]")]
     [ApiController]
     [ServiceFilter(typeof(ValidationHandler))]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     public class CustomersController : ControllerBase
     {
         private readonly IEnumerable<IGetCustomers> get;
@@ -29,7 +31,7 @@ namespace Customer.API.Features
         }
 
         /// <summary>
-        ///   GetCustomers All customers 
+        /// GetCustomers All customers 
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -40,16 +42,33 @@ namespace Customer.API.Features
         }
 
         /// <summary>
-        ///Search customer by date of birth 
+        /// Search customer by date of birth 
         /// </summary>
         /// <param name="date"></param>
         /// <returns></returns>
         [HttpGet("{search}")]
+        [MapToApiVersion("1.0")]
         public async Task<IActionResult> SearchByDate(DateTime date)
         {
             var result = await this.get.First().Handler(new SerachModel { DOB = date });
 
             return !result.Any() ? NotFound(Constant.SerachNotFound) : (IActionResult)Ok(result);
+        }
+
+        /// <summary>
+        /// Search customer by date of birth And will show the count of customers
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        [HttpGet("{search}")]
+        [MapToApiVersion("2.0")]
+        public async Task<IActionResult> SearchByDateWithCount(DateTime date)
+        {
+            var customers = await this.get.First().Handler(new SerachModel { DOB = date });
+
+            var result = new { count = customers.Count(), customers };
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -66,7 +85,7 @@ namespace Customer.API.Features
         }
 
         /// <summary>
-        ///  Create new Customer
+        /// Create new Customer
         /// </summary>
         /// <param name="customer"></param>
         /// <returns></returns>
@@ -78,7 +97,7 @@ namespace Customer.API.Features
         }
 
         /// <summary>
-        ///  Delete a Customer based on customerId
+        /// Delete a Customer based on customerId
         /// </summary>
         /// <param name="customerId"></param>
         /// <returns></returns>
@@ -93,7 +112,7 @@ namespace Customer.API.Features
         }
 
         /// <summary>
-        ///  Update Customers
+        /// Update Customers
         /// </summary>
         /// <param name="customer"></param>
         /// <returns></returns>

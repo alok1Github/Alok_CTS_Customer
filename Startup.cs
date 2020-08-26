@@ -12,20 +12,20 @@ using Newtonsoft.Json;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Net;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 
 namespace Customer.API
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
 
         }
 
-        public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<IRepository, Repository>();
@@ -36,13 +36,23 @@ namespace Customer.API
             services.AddScoped<IDeleteCustomer, DeleteCustomers>();
             services.AddScoped<ValidationHandler>();
             services.AddAutoMapper(typeof(Startup));
-            services
-         .AddMvc()
-         .AddJsonOptions(opts =>
-         {
-             opts.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
 
-         });
+            services.AddMvc()
+                    .AddJsonOptions(opts =>
+                    {
+                        opts.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
+
+                    });
+
+            services.AddMvc(o => o.EnableEndpointRouting = false);
+
+            services.AddApiVersioning(option =>
+            {
+                option.AssumeDefaultVersionWhenUnspecified = true;
+                option.ReportApiVersions = true;
+                option.DefaultApiVersion = new ApiVersion(1, 0);
+                option.ApiVersionReader = new QueryStringApiVersionReader("version");
+            });
 
             services.AddControllersWithViews();
         }

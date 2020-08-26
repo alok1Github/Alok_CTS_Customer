@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Customer.DataAccess.BusinessObject
 {
-    public class Customers : BusinessObjectBase
+    public class Customers
     {
         [JsonProperty(PropertyName = "id")]
         public string Id { get; set; }
