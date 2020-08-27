@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Customer.API.ExceptionHandlers;
+using Customer.API.Models;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Customer.API.ExceptionHandlers;
-using Customer.API.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Customer.API.Features
 {
@@ -22,7 +21,7 @@ namespace Customer.API.Features
         private readonly IDeleteCustomer delete;
 
         public CustomersController(IEnumerable<IGetCustomers> get, IPostCustomer post,
-                                    IPutCustomer put, IDeleteCustomer delete)
+                                   IPutCustomer put, IDeleteCustomer delete)
         {
             this.get = get;
             this.post = post;
@@ -48,11 +47,11 @@ namespace Customer.API.Features
         /// <returns></returns>
         [HttpGet("{search}")]
         [MapToApiVersion("1.0")]
-        public async Task<IActionResult> SearchByDate(DateTime date)
+        public async Task<IActionResult> SearchByDate(DateTimeOffset date)
         {
             var result = await this.get.First().Handler(new SerachModel { DOB = date });
 
-            return !result.Any() ? NotFound(Constant.SerachNotFound) : (IActionResult)Ok(result);
+            return !result.Any() ? NotFound(Constant.NotFound) : (IActionResult)Ok(result);
         }
 
         /// <summary>
@@ -77,11 +76,11 @@ namespace Customer.API.Features
         /// <param name="code"></param>
         /// <returns></returns>  
         [HttpGet("{search}/postCode")]
-        public async Task<IActionResult> SearchByPostCode(int code)
+        public async Task<IActionResult> SearchByPostCode(string code)
         {
             var result = await this.get.First().Handler(new SerachModel { ZipCode = code.ToString(), DOB = null });
 
-            return !result.Any() ? NotFound(Constant.SerachNotFound) : (IActionResult)Ok(result);
+            return !result.Any() ? NotFound(Constant.NotFound) : (IActionResult)Ok(result);
         }
 
         /// <summary>
@@ -119,8 +118,9 @@ namespace Customer.API.Features
         [HttpPut]
         public async Task<IActionResult> UpdateCustomer(CustomerModel customer)
         {
-            await this.put.Handler(customer);
-            return Ok();
+            var result = await this.put.Handler(customer);
+
+            return !result.Any() ? NotFound(Constant.NotFound) : (IActionResult)Ok(result);
         }
     }
 }

@@ -1,9 +1,7 @@
 ﻿using AutoMapper;
 using Customer.API.Models;
 using Customer.DataAccess.Data;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Customer.API.Features
@@ -18,12 +16,10 @@ namespace Customer.API.Features
             this.repository = repository;
             this.mapper = mapper;
         }
-        public Task<IEnumerable<CustomerModel>> Handler(SerachModel searchRequest = null)
-        {
-            return this.repository.GetAllCustomers()
-                                   .ContinueWith(t =>
-                                    this.mapper.Map<IEnumerable<CustomerModel>>(t.Result),
-                                    TaskContinuationOptions.OnlyOnRanToCompletion);
-        }
+        public Task<IEnumerable<CustomerModel>> Handler(SerachModel searchRequest = null) =>
+             this.repository.GetAllCustomers().ContinueWith(t =>
+             this.mapper.Map<IEnumerable<CustomerModel>>(t.Result),
+             TaskContinuationOptions.OnlyOnRanToCompletion);
+
     }
 }

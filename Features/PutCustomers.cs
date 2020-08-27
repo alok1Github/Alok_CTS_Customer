@@ -2,17 +2,14 @@
 using Customer.API.Models;
 using Customer.DataAccess.BusinessObject;
 using Customer.DataAccess.Data;
-using Microsoft.Azure.Cosmos;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Customer.API.Features
 {
     public interface IPutCustomer
     {
-        Task Handler(CustomerModel request);
+        Task<IEnumerable<CustomerModel>> Handler(CustomerModel request);
     }
 
     public class PutCustomers : IPutCustomer
@@ -25,12 +22,15 @@ namespace Customer.API.Features
             this.repository = repository;
             this.mapper = mapper;
         }
-
-        public Task Handler(CustomerModel request)
+        public Task<IEnumerable<CustomerModel>> Handler(CustomerModel request)
         {
             var customer = this.mapper.Map<Customers>(request);
 
-            return this.repository.UpdateCustomer(customer);
+            return this.repository.UpdateCustomer(customer)
+                          .ContinueWith(t =>
+                                     this.mapper.Map<IEnumerable<CustomerModel>>(t.Result),
+                                     TaskContinuationOptions.OnlyOnRanToCompletion);
         }
     }
 }
+

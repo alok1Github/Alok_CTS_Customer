@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Customer.API
 {
     public class DateTimeConverter : JsonConverter<DateTimeOffset>
     {
+        //   private const string TwitterDateFormat = "ddd MMM dd HH:mm:ss +ffff yyyy";
+
         private const string TwitterDateFormat = "MM/dd/yyyy";
 
         public override DateTimeOffset Read(

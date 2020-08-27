@@ -1,19 +1,17 @@
 using AutoMapper;
-using Customer.DataAccess.Data;
+using Customer.API.ExceptionHandlers;
 using Customer.API.Features;
+using Customer.DataAccess.Data;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Customer.API.ExceptionHandlers;
-using Microsoft.AspNetCore.Diagnostics;
 using Newtonsoft.Json;
-using Microsoft.AspNetCore.Http;
-using System;
-using System.Net;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Versioning;
 
 namespace Customer.API
 {

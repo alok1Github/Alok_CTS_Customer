@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Customer.DataAccess.BusinessObject;
+using Microsoft.Azure.Cosmos;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Customer.DataAccess;
-using Customer.DataAccess.BusinessObject;
-using Microsoft.Azure.Cosmos;
 
 namespace Customer.DataAccess.Data
 {
@@ -30,19 +29,25 @@ namespace Customer.DataAccess.Data
             }
         }
 
-        public async Task UpdateCustomer(Customers customer)
+        public async Task<IEnumerable<Customers>> UpdateCustomer(Customers customer)
         {
             var customers = CosmoDB.Container.GetItemLinqQueryable<Customers>(allowSynchronousQueryExecution: true)
                                            .Where(c => c.CustomerId == customer.CustomerId)
                                            .ToList();
+
+            var updatedCustomer = new List<Customers>();
 
             foreach (var document in customers)
             {
                 document.BankDetails = customer.BankDetails;
                 document.Address = customer.Address;
                 document.PersonalDetail = customer.PersonalDetail;
-                await CosmoDB.Container.ReplaceItemAsync<Customers>(document, document.Id, new PartitionKey(document.CustomerId));
+                var task = await CosmoDB.Container.ReplaceItemAsync(document, document.Id, new PartitionKey(document.CustomerId));
+
+                updatedCustomer.Add(task.Resource);
             }
+
+            return updatedCustomer;
 
         }
 

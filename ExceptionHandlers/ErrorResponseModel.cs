@@ -1,8 +1,3 @@
-using Microsoft.AspNetCore.Http;
-using System;
-using System.Net;
-using System.Web.Mvc;
-
 namespace Customer.API.ExceptionHandlers
 {
     public class ErrorResponseModel

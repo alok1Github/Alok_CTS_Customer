@@ -2,9 +2,7 @@
 using Customer.API.Models;
 using Customer.DataAccess.BusinessObject;
 using Customer.DataAccess.Data;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Customer.API.Features

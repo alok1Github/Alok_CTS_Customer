@@ -1,11 +1,4 @@
-﻿using AutoMapper;
-using Customer.API.Models;
-using Customer.DataAccess.BusinessObject;
-using Customer.DataAccess.Data;
-using Microsoft.Azure.Cosmos;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Customer.DataAccess.Data;
 using System.Threading.Tasks;
 
 namespace Customer.API.Features
