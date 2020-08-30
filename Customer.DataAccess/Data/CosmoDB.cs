@@ -16,7 +16,7 @@ namespace Customer.DataAccess.Data
 
         private static Container containerobj;
         private const string Customers = "customers";
-        private const string Key = "/customerId";
+        private const string Key = "/id";
 
         static CosmoDB()
         {

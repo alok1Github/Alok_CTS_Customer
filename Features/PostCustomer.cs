@@ -7,12 +7,8 @@ using System.Threading.Tasks;
 
 namespace Customer.API.Features
 {
-    public interface IPostCustomer
-    {
-        Task<CustomerModel> Handler(CustomerModel request);
-    }
 
-    public class PostCustomer : IPostCustomer
+    public class PostCustomer : IUpdateCustomer
     {
         private readonly IRepository repository;
         private readonly IMapper mapper;

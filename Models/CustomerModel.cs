@@ -11,9 +11,6 @@ namespace Customer.API.Models
         [JsonProperty(PropertyName = "id")]
         public string Id { get; set; }
 
-        [JsonProperty(PropertyName = "customerId")]
-        public int CustomerId { get; set; }
-
         [JsonProperty(PropertyName = "bankDetails")]
         public BankDetailsModel BankDetails { get; set; }
 

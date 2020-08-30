@@ -16,16 +16,15 @@ namespace Customer.API.Features
     public class CustomersController : ControllerBase
     {
         private readonly IEnumerable<IGetCustomers> get;
-        private readonly IPostCustomer post;
-        private readonly IPutCustomer put;
+        private readonly IEnumerable<IUpdateCustomer> update;
         private readonly IDeleteCustomer delete;
 
-        public CustomersController(IEnumerable<IGetCustomers> get, IPostCustomer post,
-                                   IPutCustomer put, IDeleteCustomer delete)
+        public CustomersController(IEnumerable<IGetCustomers> get,
+                                   IEnumerable<IUpdateCustomer> update,
+                                   IDeleteCustomer delete)
         {
             this.get = get;
-            this.post = post;
-            this.put = put;
+            this.update = update;
             this.delete = delete;
         }
 
@@ -37,7 +36,8 @@ namespace Customer.API.Features
         public async Task<IActionResult> GetCustomers()
         {
             var result = await this.get.Last().Handler();
-            return Ok(result);
+
+            return !result.Any() ? NotFound(Constant.NotCustomer) : (IActionResult)Ok(result);
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace Customer.API.Features
         [HttpPost]
         public async Task<ActionResult<CustomerModel>> CreateCustomer(CustomerModel customer)
         {
-            var result = await this.post.Handler(customer);
+            var result = await this.update.First().Handler(customer);
             return Ok(result);
         }
 
@@ -101,9 +101,9 @@ namespace Customer.API.Features
         /// <param name="customerId"></param>
         /// <returns></returns>
         [HttpDelete("{customerId}")]
-        public async Task<IActionResult> DeleteCustomer(int customerId)
+        public async Task<IActionResult> DeleteCustomer(string customerId)
         {
-            if (customerId <= 0) BadRequest(Constant.BadId);
+            if (string.IsNullOrEmpty(customerId)) BadRequest(Constant.BadId);
 
             await this.delete.Handler(customerId);
 
@@ -111,16 +111,15 @@ namespace Customer.API.Features
         }
 
         /// <summary>
-        /// Update Customers
+        /// Update Customer
         /// </summary>
         /// <param name="customer"></param>
         /// <returns></returns>
         [HttpPut]
         public async Task<IActionResult> UpdateCustomer(CustomerModel customer)
         {
-            var result = await this.put.Handler(customer);
-
-            return !result.Any() ? NotFound(Constant.NotFound) : (IActionResult)Ok(result);
+            var result = await this.update.Last().Handler(customer);
+            return Ok(result);
         }
     }
 }

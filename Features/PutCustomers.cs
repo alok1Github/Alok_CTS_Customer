@@ -7,12 +7,7 @@ using System.Threading.Tasks;
 
 namespace Customer.API.Features
 {
-    public interface IPutCustomer
-    {
-        Task<IEnumerable<CustomerModel>> Handler(CustomerModel request);
-    }
-
-    public class PutCustomers : IPutCustomer
+    public class PutCustomers : IUpdateCustomer
     {
         private readonly IRepository repository;
         private readonly IMapper mapper;
@@ -22,13 +17,13 @@ namespace Customer.API.Features
             this.repository = repository;
             this.mapper = mapper;
         }
-        public Task<IEnumerable<CustomerModel>> Handler(CustomerModel request)
+        public Task<CustomerModel> Handler(CustomerModel request)
         {
             var customer = this.mapper.Map<Customers>(request);
 
             return this.repository.UpdateCustomer(customer)
                           .ContinueWith(t =>
-                                     this.mapper.Map<IEnumerable<CustomerModel>>(t.Result),
+                                     this.mapper.Map<CustomerModel>(t.Result),
                                      TaskContinuationOptions.OnlyOnRanToCompletion);
         }
     }

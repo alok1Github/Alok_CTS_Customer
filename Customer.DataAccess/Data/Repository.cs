@@ -14,41 +14,28 @@ namespace Customer.DataAccess.Data
             Task.Run(() => CosmoDB.Container.GetItemLinqQueryable<Customers>(allowSynchronousQueryExecution: true).AsEnumerable());
 
         public async Task<Customers> CreateCustomer(Customers customer) =>
-             await CosmoDB.Container.CreateItemAsync(customer, new PartitionKey(customer.CustomerId));
+             await CosmoDB.Container.UpsertItemAsync(customer, new PartitionKey(customer.Id));
 
 
-        public async Task DeleteCustomer(int customerId)
+        public async Task DeleteCustomer(string customerId)
         {
-            var customers = CosmoDB.Container.GetItemLinqQueryable<Customers>(allowSynchronousQueryExecution: true)
-                                             .Where(c => c.CustomerId == customerId)
-                                             .ToList();
+            var customer = await GetCustomers(c => c.Id == customerId);
 
-            foreach (var customer in customers)
-            {
-                await CosmoDB.Container.DeleteItemAsync<Customers>(customer.Id, new PartitionKey(customer.CustomerId));
-            }
+            await CosmoDB.Container.DeleteItemAsync<Customers>(customer[0].Id, new PartitionKey(customer[0].Id));
         }
 
-        public async Task<IEnumerable<Customers>> UpdateCustomer(Customers customer)
+
+        public async Task<Customers> UpdateCustomer(Customers customer)
         {
-            var customers = CosmoDB.Container.GetItemLinqQueryable<Customers>(allowSynchronousQueryExecution: true)
-                                           .Where(c => c.CustomerId == customer.CustomerId)
-                                           .ToList();
+            var document = await GetCustomers(c => c.Id == customer.Id);
 
-            var updatedCustomer = new List<Customers>();
+            document[0].BankDetails = customer.BankDetails;
+            document[0].Address = customer.Address;
+            document[0].PersonalDetail = customer.PersonalDetail;
 
-            foreach (var document in customers)
-            {
-                document.BankDetails = customer.BankDetails;
-                document.Address = customer.Address;
-                document.PersonalDetail = customer.PersonalDetail;
-                var task = await CosmoDB.Container.ReplaceItemAsync(document, document.Id, new PartitionKey(document.CustomerId));
+            var task = await CosmoDB.Container.ReplaceItemAsync(document[0], document[0].Id, new PartitionKey(document[0].Id));
 
-                updatedCustomer.Add(task.Resource);
-            }
-
-            return updatedCustomer;
-
+            return task.Resource;
         }
 
         public async Task<IEnumerable<Customers>> SearchCustomers(Serach serachTerm)
@@ -59,25 +46,31 @@ namespace Customer.DataAccess.Data
             }
             if (serachTerm.DOB != null && string.IsNullOrEmpty(serachTerm.ZipCode))
             {
-                return await SearchCustomers(c => c.PersonalDetail.DOB == serachTerm.DOB);
+                return await GetCustomers(c => c.PersonalDetail.DOB == serachTerm.DOB);
             }
 
             else if (serachTerm.DOB == null && !string.IsNullOrEmpty(serachTerm.ZipCode))
             {
-                return await SearchCustomers(c => c.Address.ZipCode == serachTerm.ZipCode);
+                return await GetCustomers(c => c.Address.ZipCode == serachTerm.ZipCode);
             }
 
             else
             {
-                return await SearchCustomers(c => c.Address.ZipCode == serachTerm.ZipCode && c.PersonalDetail.DOB == serachTerm.DOB);
+                return await GetCustomers(c => c.Address.ZipCode == serachTerm.ZipCode && c.PersonalDetail.DOB == serachTerm.DOB);
             }
         }
 
-        private static Task<List<Customers>> SearchCustomers(Expression<Func<Customers, bool>> whereClause)
+        private static Task<List<Customers>> GetCustomers(Expression<Func<Customers, bool>> whereClause)
         {
-            return Task.Run(() => CosmoDB.Container.GetItemLinqQueryable<Customers>(allowSynchronousQueryExecution: true)
+            var task = Task.Run(() => CosmoDB.Container.GetItemLinqQueryable<Customers>(allowSynchronousQueryExecution: true)
                                            .Where(whereClause)
                                            .ToList());
+
+            return task.ContinueWith(t =>
+            {
+                if (!t.Result.Any()) throw new InvalidOperationException("No customer record found in database for this id");
+                return t.Result;
+            }, TaskContinuationOptions.OnlyOnRanToCompletion);
         }
     }
 }
