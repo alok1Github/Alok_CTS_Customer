@@ -22,7 +22,6 @@ namespace Customer.API.Features
         public Task<CustomerModel> Handler(CustomerModel request)
         {
             var customer = this.mapper.Map<Customers>(request);
-            customer.Id = Guid.NewGuid().ToString();
 
             return this.repository.CreateCustomer(customer)
                                    .ContinueWith(t => this.mapper.Map<CustomerModel>(t.Result),

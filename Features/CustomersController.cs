@@ -101,13 +101,13 @@ namespace Customer.API.Features
         /// <param name="customerId"></param>
         /// <returns></returns>
         [HttpDelete("{customerId}")]
-        public async Task<IActionResult> DeleteCustomer(string customerId)
+        public async Task<IActionResult> DeleteCustomer(CustomerModel customer)
         {
-            if (string.IsNullOrEmpty(customerId)) BadRequest(Constant.BadId);
+            if (string.IsNullOrEmpty(customer.Id)) BadRequest(Constant.BadId);
 
-            await this.delete.Handler(customerId);
+            var result = await this.delete.Handler(customer);
 
-            return Ok();
+            return Ok(result);
         }
 
         /// <summary>

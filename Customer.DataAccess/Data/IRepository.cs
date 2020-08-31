@@ -8,7 +8,7 @@ namespace Customer.DataAccess.Data
     {
         Task<IEnumerable<Customers>> GetAllCustomers();
         Task<Customers> CreateCustomer(Customers customer);
-        Task DeleteCustomer(string customerId);
+        Task<Customers> DeleteCustomer(Customers customer);
         Task<Customers> UpdateCustomer(Customers customer);
         Task<IEnumerable<Customers>> SearchCustomers(Serach customer);
     }
