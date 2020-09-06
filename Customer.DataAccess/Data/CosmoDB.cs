@@ -19,7 +19,7 @@ namespace Customer.DataAccess.Data
 
         private const string mainkey = "/customerId";
         private const string leaseKey = "/id";
-        private const string replicaKey = "/dob";
+        private const string replicaKey = "/address/zipCode";
 
         private readonly static int? timetoLive = 90 * 60 * 60 * 24;
 

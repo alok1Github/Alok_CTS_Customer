@@ -35,9 +35,16 @@ namespace Customer.API.Features
         [HttpGet]
         public async Task<IActionResult> GetCustomers()
         {
-            var result = await this.get.Last().Handler();
+            var customers = await this.get.Last().Handler();
 
-            return !result.Any() ? NotFound(Constant.NotCustomer) : (IActionResult)Ok(result);
+            if (!customers.Any())
+            {
+                return NotFound(Constant.NotCustomer);
+            }
+
+            var result = new { count = customers.Count(), customers };
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -64,6 +71,29 @@ namespace Customer.API.Features
         public async Task<IActionResult> SearchByDateWithCount(DateTime date)
         {
             var customers = await this.get.First().Handler(new SerachModel { DOB = date });
+
+            var result = new { count = customers.Count(), customers };
+
+            return Ok(result);
+        }
+
+
+        /// <summary>
+        /// Search customer by date of birth And PostCode
+        /// </summary>
+        /// <param name="date"></param>
+        /// <param name="postCode"></param>
+        /// <returns></returns>
+        [HttpGet("dateAndCode")]
+        [MapToApiVersion("1.0")]
+        public async Task<IActionResult> SearchByDateAndCode(DateTimeOffset date, string postCode)
+        {
+            var customers = await this.get.First().Handler(new SerachModel { DOB = date, ZipCode = postCode });
+
+            if (!customers.Any())
+            {
+                return NotFound(Constant.NotCustomer);
+            }
 
             var result = new { count = customers.Count(), customers };
 
@@ -103,11 +133,13 @@ namespace Customer.API.Features
         [HttpDelete("{customerId}")]
         public async Task<IActionResult> DeleteCustomer(CustomerModel customer)
         {
-            if (string.IsNullOrEmpty(customer.Id)) BadRequest(Constant.BadId);
+            if (customer == null) BadRequest(Constant.CustomerInfo);
+
+            if (string.IsNullOrEmpty(customer.customerId)) BadRequest(Constant.BadId);
 
             var result = await this.delete.Handler(customer);
 
-            return Ok(result);
+            return result != null ? (IActionResult)Ok(result) : NotFound(Constant.NotFound);
         }
 
         /// <summary>
@@ -118,8 +150,13 @@ namespace Customer.API.Features
         [HttpPut]
         public async Task<IActionResult> UpdateCustomer(CustomerModel customer)
         {
+            if (customer == null) BadRequest(Constant.CustomerInfo);
+
+            if (string.IsNullOrEmpty(customer.customerId)) BadRequest(Constant.BadId);
+
             var result = await this.update.Last().Handler(customer);
-            return Ok(result);
+
+            return result != null ? (IActionResult)Ok(result) : NotFound(Constant.NotFound);
         }
     }
 }
